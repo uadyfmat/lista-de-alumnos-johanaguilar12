@@ -1,17 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 //Johan Ricardo Aguilar Perez
 //Estructuras de datos
-typedef struct {
-    char * NombreCompleto;
+typedef struct Alumno {
+    char *NombreCompleto;
     int CreditosAprobados;
     int SemestreEquivalente;
 } Alumno;
 
 typedef Alumno *AlumnoPtr;
 
-typedef struct {
+typedef struct Nodo {
     Alumno *alumno;
     struct Nodo *enlace;
 } Nodo;
@@ -19,41 +20,51 @@ typedef struct {
 typedef Nodo *NodoPtr;
 
 //Declaracion de firmas de las funciones a utilizar
-AlumnoPtr crearAlumno(char*, int, int); 
+AlumnoPtr crearAlumno(char* NombreCompleto, int CreditosAprobados, int SemestreEquivalente); 
 void imprimirAlumno(AlumnoPtr actual);
 NodoPtr crearNodo(AlumnoPtr alumno);
 void insertarNodoOrdenadoCreditos(NodoPtr *cabecera, NodoPtr nuevo);
-void imprimirLista(NodoPtr *cabecera);
+void imprimirLista(NodoPtr cabecera);
 
 int main(){
     NodoPtr cabecera = NULL;
+    AlumnoPtr alumno1, alumno2, alumno3, alumno4, alumno5;
 
-    Alumno alumno1 = {"Johan Aguilar Perez", 5, 7};
-    Alumno alumno2 = {"Josueh Cabrera Alcocer", 6, 8};
-    Alumno alumno3 = {"Ricardo Cordova Martinez", 9, 3};
-    Alumno alumno4 = {"Julio Alcocer Herrera", 8, 4};
-    Alumno alumno5 = {"Mauro Ku Esquivel", 5, 4};
+    alumno1 = crearAlumno("Johan Aguilar", 55, 7);
+    alumno2 = crearAlumno("Josueh Cabrera", 63, 8);
+    alumno3 = crearAlumno("Ricardo Cordova", 49, 3);
+    alumno4 = crearAlumno("Julio Alcocer", 90, 3);
+    alumno5 = crearAlumno("Mauro Kuh", 25, 4);
 
+   /*printf("Se ha creado una estructura Alumno en la direccion %p\n", (void *)alumno1);
+    printf("Se ha creado una estructura Alumno en la direccion %p\n", (void *)alumno2);
+    printf("Se ha creado una estructura Alumno en la direccion %p\n", (void *)alumno3);
+    printf("Se ha creado una estructura Alumno en la direccion %p\n", (void *)alumno4);
+    printf("Se ha creado una estructura Alumno en la direccion %p\n", (void *)alumno5); */
+
+    insertarNodoOrdenadoCreditos(&cabecera, crearNodo(alumno1));
+	insertarNodoOrdenadoCreditos(&cabecera, crearNodo(alumno2));
+    insertarNodoOrdenadoCreditos(&cabecera, crearNodo(alumno3));
+    insertarNodoOrdenadoCreditos(&cabecera, crearNodo(alumno4));
+    insertarNodoOrdenadoCreditos(&cabecera, crearNodo(alumno5)); 
+
+    imprimirLista(cabecera);
     
-
-
     return 0;
 }
 
-AlumnoPtr crearAlumno(char*, int, int){  //Funcion para crear alumno
+AlumnoPtr crearAlumno(char* NombreCompleto, int CreditosAprobados, int SemestreEquivalente){  //Funcion para crear alumno
     AlumnoPtr nuevo = (Alumno*)malloc(sizeof(Alumno));
 
 	nuevo->NombreCompleto = strdup(NombreCompleto);
     nuevo->CreditosAprobados = CreditosAprobados;
     nuevo->SemestreEquivalente = SemestreEquivalente;
-	nuevo->enlace = NULL;
-	
-	return nuevo;
+    
+    return nuevo;
 }
 
 void imprimirAlumno(AlumnoPtr actual){ //Funcion para imprimir el alumno
-    printf("ALUMNO\n");
-    printf("Nombre: %s \n", actual->NombreCompleto);
+    printf("Nombre del Alumno: %s \n", actual->NombreCompleto);
     printf("Creditos Aprobados: %d \n", actual->CreditosAprobados);
     printf("Semestre Equivalente: %d \n\n", actual->SemestreEquivalente);
 }
@@ -67,37 +78,35 @@ NodoPtr crearNodo(AlumnoPtr alumno){  //Funcion para crear un Nodo
     return nuevo;
 }
 
-void insertarNodoOrdenadoCreditos(NodoPtr *cabecera, NodoPtr nuevo){ //Funcion para insertar de manera ordenada
+void insertarNodoOrdenadoCreditos(NodoPtr *cabecera, NodoPtr nuevo) { //Funcion para insertar los nodos
     NodoPtr anterior = NULL, actual = *cabecera;
 
-    while (actual != NULL && nuevo->CreditosAprobados < actual->CreditosAprobados){  //Se busca la posicion adecuada
+    while (actual != NULL && nuevo->alumno->CreditosAprobados < actual->alumno->CreditosAprobados) {
         anterior = actual;
-		actual = actual->enlace;
+        actual = actual->enlace;
     }
 
-    if(anterior == NULL){ //Si es el primer elemento de la lista
-		nuevo->enlace = *cabecera;
-		*cabecera = nuevo;
-	}
-	else{ //Si es en medio o al final
-		anterior->enlace = nuevo;  //Se actualiza el enlace del anterior
-		nuevo->enlace = actual; //El nuevo dato apunta al actual
-	};
-
+    if (anterior == NULL) { // Si es el primer elemento de la lista
+        nuevo->enlace = *cabecera;
+        *cabecera = nuevo;
+    } else { // Si es en medio o al final
+        anterior->enlace = nuevo; // Se actualiza el enlace del anterior
+        nuevo->enlace = actual; // El nuevo dato apunta al actual
+    }
 }
 
-void imprimirLista(NodoPtr *cabecera){ //Funcion para imprimir lista
-    NodoPtr anterior = NULL, actual = *cabecera;
+void imprimirLista(NodoPtr cabecera){ //Funcion para imprimir lista
+    NodoPtr actual = cabecera;
 
     if (actual == NULL){                           //Revisa si la lista esta vacia
 		printf("Lista vacia \n\n");
 	}
 	else{
-		printf("Contenido de la lista:\n");
+		printf("\nImpresion de la lista de alumnos (Creditos Descendentes):\n\n");
 		while(actual != NULL){                   //Imprime la lista
 			imprimirAlumno(actual->alumno);
-			actual = actual->enlace;  
+			actual = actual->enlace;
 		}
-		printf("NULL\n\n");
+		printf("FINAL\n\n");
     }
 }
